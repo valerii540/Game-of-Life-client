@@ -19,9 +19,12 @@ config/name="Game-of-life-client"
 run/main_scene="res://TileMap.tscn"
 config/icon="res://icon.png"
 
-[display]
+[debug]
 
-window/stretch/aspect="keep"
+gdscript/warnings/unsafe_property_access=true
+gdscript/warnings/unsafe_method_access=true
+gdscript/warnings/unsafe_cast=true
+gdscript/warnings/unsafe_call_argument=true
 
 [rendering]
 

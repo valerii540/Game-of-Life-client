@@ -1,12 +1,14 @@
 extends TileMap
 
 var timer = Timer.new()
-var screen_stretch = 1.0
+var _screen_stretch = 1.0
+var _screen_stretch_step = 0.01
 
-# Called when the node enters the scene tree for the first time.
+
+var dragging = false
+var _previousPosition: Vector2 = Vector2(0, 0);
+
 func _ready():
-	
-	#get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED,SceneTree.STRETCH_ASPECT_KEEP, Vector2(1, 1), 0.5)
 	var e = $HTTPRequest.connect("request_completed", self, "_on_request_completed")
 	if e:
 		print("HTTP internal failure: %s" % e)
@@ -20,11 +22,23 @@ func _ready():
 func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_WHEEL_UP and event.pressed:
-			screen_stretch += 0.1
-			get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_KEEP, Vector2(1, 1), screen_stretch)
+			_screen_stretch += _screen_stretch_step
+			get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_EXPAND, Vector2(1, 1), _screen_stretch)
+			print(_screen_stretch)
 		elif event.button_index == BUTTON_WHEEL_DOWN and event.pressed:
-			screen_stretch -= 0.1
-			get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_KEEP, Vector2(1, 1), screen_stretch)
+			if _screen_stretch - _screen_stretch_step > 0.1:
+				_screen_stretch -= _screen_stretch_step
+				get_tree().set_screen_stretch(SceneTree.STRETCH_MODE_DISABLED, SceneTree.STRETCH_ASPECT_EXPAND, Vector2(1, 1), _screen_stretch)
+			print(_screen_stretch)
+		elif event.button_index == BUTTON_LEFT:
+			if event.is_pressed():
+				_previousPosition = event.position
+				dragging = true
+			else:
+				dragging = false
+	elif dragging and event is InputEventMouseMotion:
+		position += (event.position - _previousPosition)
+		_previousPosition = event.position
 
 func _update():
 	timer.set_paused(true)
@@ -37,12 +51,14 @@ func _on_request_completed(result, response_code, headers, body):
 		var epoch = json.result['e']
 		var matrix = json.result['m']
 		
-		print("epoch: %s" % epoch)
-		print_matrix(matrix)
+		#print("epoch: %s" % epoch)
+		#print_matrix(matrix)
 		
 		for i in range(0, matrix.size()):
 			for j in range(0, matrix[0].size()):
 				set_cell(j, i, matrix[i][j])
+	elif response_code == 0:
+		printerr("Server unavailable")
 	else:
 		printerr("HTTP requset failure: code %d" % response_code)
 	
