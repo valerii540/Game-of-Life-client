@@ -1,7 +1,7 @@
 extends Node2D
 
 # Drawning
-const _rect_size = Vector2(64, 64)
+const _rect_size = Vector2(8, 8)
 
 # Game
 var _matrix = null
@@ -40,9 +40,6 @@ func _on_request_completed(_result, _response_code, _headers, _body):
 
 #		var epoch = json.result['e']
 		_matrix = json.result['m']
-
-		#print("epoch: %s" % epoch)
-		#print_matrix(matrix)
 
 		update()
 	elif _response_code == 0:
