@@ -1,7 +1,8 @@
 extends Node2D
 
 # Drawning
-const _rect_size = Vector2(8, 8)
+const _square_side = 8
+const _rect_size   = Vector2(_square_side, _square_side)
 
 # Game
 var _matrix = null
@@ -12,19 +13,32 @@ var _previousPosition      = Vector2(0, 0);
 var _screen_stretch        = 1.0
 const _screen_stretch_step = 0.01
 
-#Misc
-var _timer = Timer.new()
+# Misc
+var _timer          = Timer.new()
+const _interval_sec = 0.5
 
 func _draw():
 	if _matrix:
 		_draw_matrix()
 
+func _draw_matrix():
+	for i in range(0, _matrix.size()):
+		for j in range(0, _matrix[0].size()):
+			var rect = Rect2(Vector2(j * _rect_size.y, i * _rect_size.x), _rect_size)
+			match _matrix[i][j]:
+				0.0:
+					draw_rect(rect, Color.black)
+				1.0:
+					draw_rect(rect, Color.green)
+
 func _ready():
+	set_physics_process(false)
+
 	var e = $HTTPRequest.connect("request_completed", self, "_on_request_completed")
 	if e:
 		print("HTTP internal failure: %s" % e)
 
-	_timer.set_wait_time(0.5)
+	_timer.set_wait_time(_interval_sec)
 	_timer.connect("timeout", self, "_update")
 	add_child(_timer)
 
@@ -48,16 +62,6 @@ func _on_request_completed(_result, _response_code, _headers, _body):
 		printerr("HTTP requset failure: code %d" % _response_code)
 
 	_timer.set_paused(false)
-
-func _draw_matrix():
-	for i in range(0, _matrix.size()):
-		for j in range(0, _matrix[0].size()):
-			var rect = Rect2(Vector2(j * _rect_size.y, i * _rect_size.x), _rect_size)
-			match _matrix[i][j]:
-				0.0:
-					draw_rect(rect, Color.black)
-				1.0:
-					draw_rect(rect, Color.green)
 
 func _input(event):
 	if event is InputEventMouseButton:

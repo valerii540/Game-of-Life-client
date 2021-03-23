@@ -26,9 +26,21 @@ gdscript/warnings/unsafe_method_access=true
 gdscript/warnings/unsafe_cast=true
 gdscript/warnings/unsafe_call_argument=true
 
+[physics]
+
+common/enable_object_picking=false
+
 [rendering]
 
 quality/driver/driver_name="GLES2"
+quality/intended_usage/framebuffer_allocation=1
+quality/reflections/texture_array_reflections=false
+quality/reflections/high_quality_ggx=false
+quality/shading/force_vertex_shading=true
+quality/shading/force_lambert_over_burley=true
+quality/shading/force_blinn_over_ggx=true
+quality/depth_prepass/enable=false
 batching/options/single_rect_fallback=true
 batching/parameters/colored_vertex_format_threshold=0.0
+quality/depth/hdr=false
 environment/default_environment="res://default_env.tres"
